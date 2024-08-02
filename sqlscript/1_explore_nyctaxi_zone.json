@@ -5,12 +5,12 @@
 			"name": "nyc_taxi/discovery"
 		},
 		"content": {
-			"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'abfss://nyc-taxi-data@nyctaxistorageadls2.dfs.core.windows.net/raw/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW=TRUE,\n        FIELDTERMINATOR=',',\n        ROWTERMINATOR='\\n'\n    ) AS [result]\n",
+			"query": "SELECT\n    TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK 'abfss://nyc-taxi-data@nyctaxistorageadls2.dfs.core.windows.net/raw/taxi_zone.csv',\n            FORMAT = 'CSV',\n            PARSER_VERSION = '2.0',\n            HEADER_ROW=TRUE\n        )\n        with (LocationID  SMALLINT,\n            Borough VARCHAR(100),\n            Zone VARCHAR(100),\n            service_zone VARCHAR(100)\n            ) AS result\n\n/*EXEC sp_describe_first_result_set N'SELECT\n    TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''abfss://nyc-taxi-data@nyctaxistorageadls2.dfs.core.windows.net/raw/taxi_zone.csv'',\n            FORMAT = ''CSV'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW=TRUE\n        )\n        with (LocationID  INT,\n            Borough VARCHAR(100),\n            Zone VARCHAR(100),\n            service_zone VARCHAR(100)\n            ) AS result'\n            */",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "nyc_taxi",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
