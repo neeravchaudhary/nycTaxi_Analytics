@@ -1,0 +1,20 @@
+{
+	"name": "5_explore_payment_type",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/discovery"
+		},
+		"content": {
+			"query": "use nyc_taxi\n\n--- using json Value\n\nselect \n    JSON_VALUE(jsondata,'$.payment_type') as payment_type,\n    JSON_VALUE(jsondata,'$.payment_type_desc') as payment_type_Desc\nfrom \n    OPENROWSET(\n        BULK 'payment_type.json',\n        DATA_SOURCE='nyc_taxi_data_raw',\n        FORMAT='CSV',\n        FIELDTERMINATOR='0x0b',\n        FIELDQUOTE='0x0b'\n    ) with  \n        (\n            jsondata NVARCHAR(Max) \n        )as payment_type",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
