@@ -5,7 +5,7 @@
 			"name": "nyc_taxi/discovery"
 		},
 		"content": {
-			"query": "-- This is auto-generated code\ncreate EXTERNAL DATA SOURCE nyc_taxi_data_green\n    with(\n        LOCATION='abfss://nyc-taxi-data@nyctaxistorageadls2.dfs.core.windows.net/raw/trip_data_green_csv'\n        )\n\nSELECT\n    result.filename() as Filename,\n    count(1) as count\nFROM\n    OPENROWSET(\n        BULK 'year=2020/**',\n        DATA_SOURCE='nyc_taxi_data_green',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW=TRUE\n    ) AS [result]\nGROUP BY result.filename()\n",
+			"query": "-- This is auto-generated code\ncreate EXTERNAL DATA SOURCE nyc_taxi_data_green\n    with(\n        LOCATION='abfss://nyc-taxi-data@nyctaxistorageadls2.dfs.core.windows.net/raw/trip_data_green_csv'\n        )\n\nSELECT\n    result.filename() as 'Filename',\n    result.filepath(1) as 'Year',\n    result.filepath(2) as 'Filepath',\n    count(1) as count\nFROM\n    OPENROWSET(\n        BULK 'year=*/month=*/*.csv',\n        DATA_SOURCE='nyc_taxi_data_green',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW=TRUE\n    ) AS [result]\nWHERE result.filepath(1)='2020'\nAND result.filepath(2) in ('02','03')\nGROUP BY result.filename(),result.filepath(1),result.filepath(2)\n",
 			"metadata": {
 				"language": "sql"
 			},
