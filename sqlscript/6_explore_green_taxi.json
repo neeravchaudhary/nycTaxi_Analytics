@@ -1,0 +1,20 @@
+{
+	"name": "6_explore_green_taxi",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/discovery"
+		},
+		"content": {
+			"query": "-- This is auto-generated code\nSELECT\n    result.filename(),\n    count(1)\nFROM\n    OPENROWSET(\n        BULK 'https://nyctaxistorageadls2.dfs.core.windows.net/nyc-taxi-data/raw/trip_data_green_csv/year=2020/month=01/*',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW=TRUE\n    ) AS [result]\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
