@@ -5,7 +5,7 @@
 			"name": "nyc_taxi/ldw"
 		},
 		"content": {
-			"query": "use nyc_taxi_ldw;\n\nselect * from bronze.taxi_zone\n\n",
+			"query": "use nyc_taxi_ldw;\n\nselect * from bronze.taxi_zone\n\nselect * from sys.external_tables where name='taxi_zone'",
 			"metadata": {
 				"language": "sql"
 			},
