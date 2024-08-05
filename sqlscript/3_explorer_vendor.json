@@ -5,7 +5,7 @@
 			"name": "nyc_taxi/discovery"
 		},
 		"content": {
-			"query": "use nyc_taxi\n\nSELECT\n    *\n    FROM\n        OPENROWSET(\n            BULK 'vendor_escaped.csv',\n            DATA_SOURCE='nyc_taxi_data_raw',\n            FORMAT = 'CSV',\n            PARSER_VERSION = '2.0',\n            HEADER_ROW=TRUE,\n            ESCAPECHAR='\\'\n        ) as vendor",
+			"query": "use nyc_taxi\n\nSELECT\n    *\n    FROM\n        OPENROWSET(\n            BULK 'vendor.csv',\n            DATA_SOURCE='nyc_taxi_data_raw',\n            FORMAT = 'CSV',\n            PARSER_VERSION = '2.0',\n            HEADER_ROW=TRUE,\n            ESCAPECHAR='\\'\n        ) as vendor",
 			"metadata": {
 				"language": "sql"
 			},
