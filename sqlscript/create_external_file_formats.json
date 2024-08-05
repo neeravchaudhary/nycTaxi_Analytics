@@ -1,5 +1,5 @@
 {
-	"name": "SQL script 1",
+	"name": "create_external_file_formats",
 	"properties": {
 		"folder": {
 			"name": "nyc_taxi/ldw"
