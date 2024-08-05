@@ -1,0 +1,20 @@
+{
+	"name": "create_silver_payment_type",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/ldw"
+		},
+		"content": {
+			"query": "use nyc_taxi_ldw\nGO\n\nIF OBJECT_ID('silver.payment_type') IS NOT NULL\nDrop EXTERNAL TABLE silver.payment_type\nGO\n\ncreate EXTERNAL TABLE silver.payment_type\nWITH(\n    LOCATION='silver/payment_type',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=parquet_file_format\n)\nAS\nSELECT payment_type,payment_type_desc \nFROM \nOPENROWSET(\n    BULK 'payment_type.json',\n    DATA_SOURCE='nyc_taxi_src',\n    FORMAT='CSV',\n    FIELDTERMINATOR='0x0b',\n    FIELDQUOTE='0x0b'\n)\nWITH\n(\n    jsondata NVARCHAR(MAX)\n) as payment_type_json\nCROSS APPLY OPENJSON(jsondata)\nWITH\n     (\n        payment_type smallint,\n        payment_type_desc varchar(25)\n    ) as payment_type_data\n\nselect * from silver.payment_type",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
