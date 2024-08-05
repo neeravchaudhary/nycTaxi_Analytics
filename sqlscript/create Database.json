@@ -1,0 +1,20 @@
+{
+	"name": "create Database",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/ldw"
+		},
+		"content": {
+			"query": "use master\nGO \n\n/* GO helps us make any statement between two go or from start to first \ngo as a seperate DBN Transaction */\n\nCREATE DATABASE nyc_taxi_ldw\nGO\n\nuse nyc_taxi_ldw\nGO\n\nCREATE SCHEMA bronze\n\nCREATE SCHEMA silver\n\nCREATE SCHEMA gold\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
