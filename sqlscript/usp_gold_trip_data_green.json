@@ -1,0 +1,20 @@
+{
+	"name": "usp_gold_trip_data_green",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/ldw/usp"
+		},
+		"content": {
+			"query": "use nyc_taxi_ldw\nGO\n\nCREATE OR ALTER PROCEDURE gold.usp_gold_trip_data_green\n@year VARCHAR(4),\n@month VARCHAR(2)\nAS\nBEGIN\n\n    DECLARE @create_sql_stmt NVARCHAR(MAX),\n            @drop_sql_stmt NVARCHAR(MAX);\n    \n    SET create_sql_stmt=\n    '\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
