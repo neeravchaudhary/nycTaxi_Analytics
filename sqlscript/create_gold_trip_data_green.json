@@ -1,11 +1,11 @@
 {
-	"name": "SQL script 2",
+	"name": "create_gold_trip_data_green",
 	"properties": {
 		"folder": {
 			"name": "nyc_taxi/ldw"
 		},
 		"content": {
-			"query": "SELECT count(1)\nFROM\n    OPENROWSET(\n        BULK 'silver/trip_data_green/year=2020/month=02/*.parquet',\n        DATA_SOURCE='nyc_taxi_src',\n        FORMAT = 'parquet'\n    ) AS [result]\n\n\nSELECT count(1)\nFROM\n    OPENROWSET(\n                BULK 'trip_data_green_csv/year=2020/month=02/*.csv',\n                DATA_SOURCE='nyc_taxi_src',\n                FORMAT = 'CSV',\n                HEADER_ROW=TRUE,\n                PARSER_VERSION='2.0'\n            ) AS [result]\n",
+			"query": "use nyc_taxi_ldw\ngold\n\nselect td.year,\ntd.month,\ncast(td.lpep_pickup_datetime as date) as trip_date,\ntz.borough,\ncal.day_name as pickup_day,\nCASE WHEN upper(cal.day_name) in ('SATURDAY','SUNDAY') THEN 'Y' else 'N' END as trip_day_weekend_ind,\nSUM(CASE WHEN upper(pt.payment_type_desc)='CREDIT CARD' THEN 1 ELSE)\nFROM\nsilver.vw_trip_data_green as td\nJOIN silver.taxi_zone tz ON td.pu_location_id=tz.location_id\nJOIN silver.calendar cal ON cast(td.lpep_pickup_datetime as date)=cal.date\nJOIN silver.payment_type pt ON td.payment_type=pt.payment_type\nwhere td.year='2020' and td.month='01'\n\nsilver.calendar as cl\nsilver.payment_type as pt\nd\nsilver.taxi_zone as tz\n\n\nselect * from silver.calendar as cl\n",
 			"metadata": {
 				"language": "sql"
 			},
