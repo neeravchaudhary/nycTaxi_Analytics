@@ -1,0 +1,20 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/ldw"
+		},
+		"content": {
+			"query": "SELECT count(1)\nFROM\n    OPENROWSET(\n        BULK 'silver/trip_data_green/year=2020/month=02/*.parquet',\n        DATA_SOURCE='nyc_taxi_src',\n        FORMAT = 'parquet'\n    ) AS [result]\n\n\nSELECT count(1)\nFROM\n    OPENROWSET(\n                BULK 'trip_data_green_csv/year=2020/month=02/*.csv',\n                DATA_SOURCE='nyc_taxi_src',\n                FORMAT = 'CSV',\n                HEADER_ROW=TRUE,\n                PARSER_VERSION='2.0'\n            ) AS [result]\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
