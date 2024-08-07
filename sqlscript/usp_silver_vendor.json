@@ -5,12 +5,12 @@
 			"name": "nyc_taxi/ldw/usp"
 		},
 		"content": {
-			"query": "",
+			"query": "use nyc_taxi_ldw\nGO\n\nCREATE OR ALTER PROCEDURE silver.usp_silver_vendor\nAS\nBEGIN\n\n    IF OBJECT_ID('silver.vendor') IS NOT NULL\n        DROP EXTERNAL TABLE silver.vendor\n\n    create EXTERNAL TABLE silver.vendor\n    WITH\n        (\n            LOCATION ='silver/vendor',\n            DATA_SOURCE = nyc_taxi_src,\n            FILE_FORMAT = parquet_file_format\n        ) \n    AS\n    SELECt * from bronze.vendor\n\nEND;",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "nyc_taxi_ldw",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
