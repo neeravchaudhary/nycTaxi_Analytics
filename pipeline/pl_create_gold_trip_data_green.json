@@ -80,7 +80,7 @@
 							}
 						},
 						{
-							"name": "create silver partition",
+							"name": "create gold partition",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -126,7 +126,7 @@
 				}
 			},
 			{
-				"name": "create silver trip data view",
+				"name": "create gold trip data view",
 				"type": "Script",
 				"dependsOn": [
 					{
