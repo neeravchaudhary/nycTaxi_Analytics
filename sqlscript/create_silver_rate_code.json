@@ -2,7 +2,7 @@
 	"name": "create_silver_rate_code",
 	"properties": {
 		"folder": {
-			"name": "nyc_taxi/ldw"
+			"name": "nyc_taxi/nyc_taxi_ldw/script_silver"
 		},
 		"content": {
 			"query": "use nyc_taxi_ldw\nGO\n\nIF OBJECT_ID('silver.rate_code') IS NOT NULL\nDROP EXTERNAL TABLE silver.rate_code \nGo\n\ncreate EXTERNAL TABLE silver.rate_code\nWITH\n    (\n        LOCATION = 'silver/rate_code',\n        DATA_SOURCE=nyc_taxi_src,\n        FILE_FORMAT=parquet_file_format\n    )\nAS\nSELECT rate_code_id,rate_code from \nOPENROWSET\n    (\n        BULK 'rate_code.json',\n        DATA_SOURCE='nyc_taxi_src',\n        FORMAT='CSV',\n        FIELDTERMINATOR='0x0b',\n        ROWTERMINATOR='0x0b',\n        FIELDQUOTE='0x0b'\n    )\n    WITH\n        (\n            jsondata NVARCHAR(MAX)\n        ) AS rate_json\n    CROSS APPLY OPENJSON(jsondata)\n    WITH \n        (\n            rate_code_id SMALLINT,\n            rate_code varchar(25)\n        ) as rate_code_data\nGO\n\nselect * from silver.rate_code;",

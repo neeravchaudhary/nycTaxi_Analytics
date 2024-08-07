@@ -1,0 +1,117 @@
+{
+	"name": "create silver tables",
+	"properties": {
+		"activities": [
+			{
+				"name": "create silver ldw",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('v_folderPath_usp_list')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Delete before next load",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_nyc_taxi_data",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": {
+											"value": "@item().folderPath",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						},
+						{
+							"name": "create silver Taxi tables",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Delete before next load",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": {
+									"value": "@item().procedureName",
+									"type": "Expression"
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_nyc_taxi_ldw",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"v_folderPath_usp_list": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"folderPath": "raw/silver/calendar",
+						"procedureName": "silver.usp_silver_calendar"
+					},
+					{
+						"folderPath": "raw/silver/payment_type",
+						"procedureName": "silver.usp_silver_payment_type"
+					},
+					{
+						"folderPath": "raw/silver/rate_code",
+						"procedureName": "silver.usp_silver_rate_code"
+					},
+					{
+						"folderPath": "raw/silver/taxi_zone",
+						"procedureName": "silver.usp_silver_taxi_zone"
+					},
+					{
+						"folderPath": "raw/silver/trip_type",
+						"procedureName": "silver.usp_silver_trip_type"
+					},
+					{
+						"folderPath": "raw/silver/vendor",
+						"procedureName": "silver.usp_silver_vendor"
+					}
+				]
+			}
+		},
+		"folder": {
+			"name": "DWH"
+		},
+		"annotations": []
+	}
+}

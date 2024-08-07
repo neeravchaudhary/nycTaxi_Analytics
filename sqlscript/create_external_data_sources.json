@@ -2,7 +2,7 @@
 	"name": "create_external_data_sources",
 	"properties": {
 		"folder": {
-			"name": "nyc_taxi/ldw"
+			"name": "nyc_taxi/nyc_taxi_ldw/Common"
 		},
 		"content": {
 			"query": "use nyc_taxi_ldw;\nIF NOT EXISTS (select * from sys.external_data_sources where name='nyc_taxi_src')\ncreate EXTERNAL DATA SOURCE nyc_taxi_src\nwith\n    (\n        LOCATION='abfss://nyc-taxi-data@nyctaxistorageadls2.dfs.core.windows.net/raw'\n    );",

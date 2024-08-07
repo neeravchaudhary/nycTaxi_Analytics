@@ -2,10 +2,10 @@
 	"name": "create_silver_trip_type",
 	"properties": {
 		"folder": {
-			"name": "nyc_taxi/ldw"
+			"name": "nyc_taxi/nyc_taxi_ldw/script_silver"
 		},
 		"content": {
-			"query": "use nyc_taxi_ldw\nGO\n\n\nIF OBJECT_ID('silver.trip_type') IS NOT NULL\n    DROP EXTERNAL TABLE silver.trip_type\n\ncreate EXTERNAL TABLE silver.trip_type\nWITH\n    (\n        LOCATION ='silver/trip_type',\n        DATA_SOURCE = nyc_taxi_src,\n        FILE_FORMAT = parquet_file_format\n    ) \nAS\nSELECT * from bronze.trip_type;\n\nselect * from silver.trip_type",
+			"query": "use nyc_taxi_ldw\nGO;\n\n\nIF OBJECT_ID('silver.trip_type') IS NOT NULL\n    DROP EXTERNAL TABLE silver.trip_type\n\ncreate EXTERNAL TABLE silver.trip_type\nWITH\n    (\n        LOCATION ='silver/trip_type',\n        DATA_SOURCE = nyc_taxi_src,\n        FILE_FORMAT = parquet_file_format\n    ) \nAS\nSELECT * from bronze.trip_type;\n",
 			"metadata": {
 				"language": "sql"
 			},
