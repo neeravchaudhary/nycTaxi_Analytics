@@ -1,0 +1,20 @@
+{
+	"name": "6_explore_trip_data_green_csv",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/discovery"
+		},
+		"content": {
+			"query": "-- This is auto-generated code\ncreate EXTERNAL DATA SOURCE nyc_taxi_data_green\n    with(\n        LOCATION='abfss://nyc-taxi-data@nyctaxistorageadls2.dfs.core.windows.net/raw/trip_data_green_csv'\n        )\n\nSELECT result.*,\nresult.filepath(1),result.filepath(2)\nFROM\n    OPENROWSET(\n        BULK 'year=*/month=*/*.csv',\n        DATA_SOURCE='nyc_taxi_data_green',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW=TRUE\n    ) AS [result]\nWHERE result.filepath(1)='2020'\nAND result.filepath(2) in ('01')\nGROUP BY result.filename(),result.filepath(1),result.filepath(2)\n\n\n\nEXEC sp_describe_first_result_set N'\nSELECT * FROM\n    OPENROWSET(\n        BULK ''year=*/month=*/*.csv'',\n        DATA_SOURCE=''nyc_taxi_data_green'',\n        FORMAT = ''CSV'',\n        PARSER_VERSION = ''2.0'',\n        HEADER_ROW = TRUE\n    ) AS [result]\nWHERE result.filepath(1) = ''2020''\nAND result.filepath(2) = ''01''\n';\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

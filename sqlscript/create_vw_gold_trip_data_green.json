@@ -1,0 +1,20 @@
+{
+	"name": "create_vw_gold_trip_data_green",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/nyc_taxi_ldw/script_gold"
+		},
+		"content": {
+			"query": "use nyc_taxi_ldw\nGO\n\nDROP VIEW IF EXISTS gold.vw_gold_trip_data_green \nGO\n\nCREATE VIEW gold.vw_gold_trip_data_green \nAS\nSELECT * FROM\n    OPENROWSET  \n        (\n            BULK 'gold/trip_data_green/year=*/month=*/*.parquet',\n            DATA_SOURCE='nyc_taxi_src',\n            FORMAT='parquet'\n        ) AS result\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

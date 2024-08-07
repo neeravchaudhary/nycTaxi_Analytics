@@ -1,0 +1,20 @@
+{
+	"name": "create_gold_trip_data_green",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/nyc_taxi_ldw/script_gold"
+		},
+		"content": {
+			"query": "use nyc_taxi_ldw\nGO\n\nselect td.year,\ntd.month,\ncast(td.lpep_pickup_datetime as date) as trip_date,\ntz.borough,\ncal.day_name as pickup_day,\nCASE WHEN upper(cal.day_name) in ('SATURDAY','SUNDAY') THEN 'Y' else 'N' END AS trip_day_weekend_ind,\nSUM(CASE WHEN upper(pt.payment_type_desc)='CREDIT CARD' THEN 1 ELSE 0 END) AS card_trip_count,\nSUM(CASE WHEN upper(pt.payment_type_desc)='CASH' THEN 1 ELSE 0 END) AS cash_trip_count,\nsum(CASE WHEN tt.trip_type_desc ='Street-hail' THEN 1 ELSE 0 END) as Street_hail_trip_count,\nsum(CASE WHEN tt.trip_type_desc ='Dispatch' THEN 1 ELSE 0 END) as Dispath_trip_count,\nround(sum(td.trip_distance),2) as trip_distance,\nround(sum(DATEDIFF(SECOND, lpep_pickup_datetime, lpep_dropoff_datetime) / 3600),2) AS trip_duration_hours,\nround(sum(td.fare_amount),2) as total_fare_amount\nFROM\nsilver.vw_trip_data_green as td\nJOIN silver.taxi_zone tz ON td.pu_location_id=tz.location_id\nJOIN silver.calendar cal ON cast(td.lpep_pickup_datetime as date)=cal.date\nJOIN silver.payment_type pt ON td.payment_type=pt.payment_type\nJOIN silver.trip_type tt ON td.trip_type=tt.trip_type\nwhere td.year='2020' and td.month='01'\nGROUP BY td.year,\ntd.month,\ncast(td.lpep_pickup_datetime as date),\ntz.borough,\ntt.trip_type_desc,\ncal.day_name",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
