@@ -126,9 +126,16 @@
 				}
 			},
 			{
-				"name": "Script1",
+				"name": "create silver trip data view",
 				"type": "Script",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "ForEachPartition",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -137,8 +144,25 @@
 					"secureInput": false
 				},
 				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_nyc_taxi_ldw",
+					"type": "LinkedServiceReference"
+				},
 				"typeProperties": {
-					"scripts": [],
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "use nyc_taxi_ldw;"
+						},
+						{
+							"type": "NonQuery",
+							"text": "DROP VIEW IF EXISTS silver.vw_trip_data_green;"
+						},
+						{
+							"type": "NonQuery",
+							"text": "CREATE VIEW silver.vw_trip_data_green\nAS\nSELECT cast (result.filepath(1) as varchar(4)) AS 'year',\ncast (result.filepath(2) as varchar(2)) AS 'month',\nresult.* \nFROM\n    OPENROWSET\n        (\n            BULK 'silver/trip_data_green/year=*/month=*/*.parquet',\n            FORMAT='parquet',\n            DATA_SOURCE='nyc_taxi_src'\n        )AS result"
+						}
+					],
 					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
