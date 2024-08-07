@@ -28,7 +28,7 @@
 				}
 			},
 			{
-				"name": "Load taxi zone",
+				"name": "create silver Taxi zone",
 				"type": "Script",
 				"dependsOn": [
 					{
