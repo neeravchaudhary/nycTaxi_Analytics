@@ -1,0 +1,20 @@
+{
+	"name": "Assignment",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/discovery"
+		},
+		"content": {
+			"query": "use nyc_taxi\n\ncreate EXTERNAL DATA SOURCE nyc_taxi_data_green_delta\n    with(\n        LOCATION='abfss://nyc-taxi-data@nyctaxistorageadls2.dfs.core.windows.net/raw'\n        )\n\nWITH trip_data_analysis AS\n(\n    SELECT\n        trip_zone.borough,\n        count(1) AS total_trips,\n        SUM(CASE payment_type_detail.payment_type_desc WHEN 'Credit card' THEN 1 ELSE 0 END) as 'card_trips',\n        SUM(CASE payment_type_detail.payment_type_desc WHEN 'Cash' THEN 1 ELSE 0 END) as 'cash_trips'\n    FROM\n        OPENROWSET(\n            BULK 'trip_data_green_delta',\n            DATA_SOURCE='nyc_taxi_data_green_delta',\n            FORMAT = 'delta'\n        ) \n        WITH(\n            year varchar(4),\n            month varchar(4),  \n            PULocationID INT,\n            payment_type INT,\n            trip_type INT\n            ) AS [trip_data]\n    JOIN \n        OPENROWSET(\n                BULK 'taxi_zone.csv',\n                DATA_SOURCE='nyc_taxi_data_raw',\n                FORMAT = 'CSV',\n                PARSER_VERSION = '2.0',\n                FIRST_ROW=2\n            )\n            with (location_id  SMALLINT 1,\n                borough VARCHAR(100) 2,\n                zone VARCHAR(100) 3,\n                service_zone VARCHAR(100) 4\n                ) AS [trip_zone]\n        ON trip_data.PULocationID=trip_zone.location_id\n    JOIN\n            OPENROWSET(\n            BULK 'payment_type.json',\n            DATA_SOURCE='nyc_taxi_data_raw',\n            FORMAT='CSV',\n            FIELDTERMINATOR='0x0b',\n            FIELDQUOTE='0x0b')\n            with  \n                (\n                    jsondata NVARCHAR(Max) \n                ) AS payment_type\n            CROSS APPLY OPENJSON(jsondata)\n            with\n            (\n                payment_type SMALLINT,\n                payment_type_desc VARCHAR(25)\n            ) AS [payment_type_detail]\n        ON trip_data.payment_type=payment_type_detail.payment_type\n    WHERE\n        trip_data.year = '2021' AND trip_data.month = '01'\n    GROUP BY   trip_zone.borough\n)\n\nselect \n    borough,\n    total_trips, \n    cash_trips,\n    card_trips,\n    ROUND(((CAST(cash_trips AS FLOAT) / total_trips) * 100),2) AS cash_trip_percentage,\n    ROUND(((CAST(card_trips AS FLOAT) / total_trips) * 100),2) AS card_trip_percentage\n    from trip_data_analysis",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

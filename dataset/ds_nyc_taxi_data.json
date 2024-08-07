@@ -1,0 +1,69 @@
+{
+	"name": "ds_nyc_taxi_data",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_nyc_taxi_data",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "raw/silver/taxi_zone",
+				"fileSystem": "nyc-taxi-data"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "date_key",
+				"type": "INT_32"
+			},
+			{
+				"name": "date",
+				"type": "DATE"
+			},
+			{
+				"name": "year",
+				"type": "INT_32"
+			},
+			{
+				"name": "month",
+				"type": "INT_16"
+			},
+			{
+				"name": "day",
+				"type": "INT_16"
+			},
+			{
+				"name": "day_name",
+				"type": "UTF8"
+			},
+			{
+				"name": "day_of_year",
+				"type": "INT_16"
+			},
+			{
+				"name": "week_of_month",
+				"type": "INT_16"
+			},
+			{
+				"name": "week_of_year",
+				"type": "INT_16"
+			},
+			{
+				"name": "month_name",
+				"type": "UTF8"
+			},
+			{
+				"name": "year_month",
+				"type": "INT_32"
+			},
+			{
+				"name": "year_weak",
+				"type": "INT_32"
+			}
+		]
+	}
+}

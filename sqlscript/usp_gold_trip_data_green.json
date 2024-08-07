@@ -1,0 +1,20 @@
+{
+	"name": "usp_gold_trip_data_green",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/ldw/usp"
+		},
+		"content": {
+			"query": "use nyc_taxi_ldw\nGO\n\nCREATE OR ALTER PROCEDURE gold.usp_gold_trip_data_green\n@year VARCHAR(4),\n@month VARCHAR(2)\nAS\nBEGIN\n\n    DECLARE @create_sql_stmt NVARCHAR(MAX),\n            @drop_sql_stmt NVARCHAR(MAX);\n    \n    SET @create_sql_stmt=\n    'CREATE EXTERNAL TABLE gold.trip_data_green_' + @year + '_' + @month +\n        ' WITH \n        (\n            LOCATION=''gold/trip_data_green/year=' + @year + '/month=' + @month + ''',\n            DATA_SOURCE = nyc_taxi_src,\n            FILE_FORMAT = parquet_file_format\n        )\n        AS\n        select td.year,\n        td.month,\n        cast(td.lpep_pickup_datetime as date) as trip_date,\n        tz.borough,\n        cal.day_name as pickup_day,\n        CASE WHEN upper(cal.day_name) in (''SATURDAY'',''SUNDAY'') THEN ''Y'' else ''N'' END AS trip_day_weekend_ind,\n        SUM(CASE WHEN upper(pt.payment_type_desc)=''CREDIT CARD'' THEN 1 ELSE 0 END) AS card_trip_count,\n        SUM(CASE WHEN upper(pt.payment_type_desc)=''CASH'' THEN 1 ELSE 0 END) AS cash_trip_count,\n        sum(CASE WHEN tt.trip_type_desc =''Street-hail'' THEN 1 ELSE 0 END) as Street_hail_trip_count,\n        sum(CASE WHEN tt.trip_type_desc =''Dispatch'' THEN 1 ELSE 0 END) as Dispath_trip_count,\n        round(sum(td.trip_distance),2) as trip_distance,\n        round(sum(DATEDIFF(SECOND, lpep_pickup_datetime, lpep_dropoff_datetime) / 3600),2) AS trip_duration_hours,\n        round(sum(td.fare_amount),2) as total_fare_amount\n        FROM\n        silver.vw_trip_data_green as td\n        JOIN silver.taxi_zone tz ON td.pu_location_id=tz.location_id\n        JOIN silver.calendar cal ON cast(td.lpep_pickup_datetime as date)=cal.date\n        JOIN silver.payment_type pt ON td.payment_type=pt.payment_type\n        JOIN silver.trip_type tt ON td.trip_type=tt.trip_type\n        where td.year=''' + @year + ''' and td.month=''' + @month + '''\n        GROUP BY td.year,\n        td.month,\n        cast(td.lpep_pickup_datetime as date),\n        tz.borough,\n        cal.day_name';\n\n    print(@create_sql_stmt);\n\n    EXEC sp_executesql @create_sql_stmt;\n\n    SET @drop_sql_stmt=\n        'DROP EXTERNAL TABLE gold.trip_data_green_' + @year + '_' + @month;\n\n    print(@drop_sql_stmt);\n\n    EXEC sp_executesql @drop_sql_stmt;\n\nEND;\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
