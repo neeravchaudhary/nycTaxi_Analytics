@@ -103,14 +103,14 @@
 								"storedProcedureParameters": {
 									"month": {
 										"value": {
-											"value": "@item().month",
+											"value": "@activity('Delete Partitions').outputitem().month",
 											"type": "Expression"
 										},
 										"type": "String"
 									},
 									"year": {
 										"value": {
-											"value": "@item().year",
+											"value": "@activity('Delete Partitions').outputitem().year",
 											"type": "Expression"
 										},
 										"type": "String"
