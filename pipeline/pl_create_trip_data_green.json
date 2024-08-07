@@ -80,7 +80,7 @@
 							}
 						},
 						{
-							"name": "create silver partitions",
+							"name": "create silver partition",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -103,14 +103,14 @@
 								"storedProcedureParameters": {
 									"month": {
 										"value": {
-											"value": "@activity('Delete Partitions').outputitem().month",
+											"value": "@item().month",
 											"type": "Expression"
 										},
 										"type": "String"
 									},
 									"year": {
 										"value": {
-											"value": "@activity('Delete Partitions').outputitem().year",
+											"value": "@item().year",
 											"type": "Expression"
 										},
 										"type": "String"
