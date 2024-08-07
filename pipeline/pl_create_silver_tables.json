@@ -45,7 +45,7 @@
 							}
 						},
 						{
-							"name": "create silver Taxi tables",
+							"name": "create silver tables",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -107,6 +107,9 @@
 						"procedureName": "silver.usp_silver_vendor"
 					}
 				]
+			},
+			"folders": {
+				"type": "Array"
 			}
 		},
 		"folder": {
