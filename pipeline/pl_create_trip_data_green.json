@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Metadata1",
-				"type": "GetMetadata",
+				"name": "getFolderList",
+				"type": "Script",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -14,29 +14,27 @@
 					"secureInput": false
 				},
 				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_nyc_taxi_ldw",
+					"type": "LinkedServiceReference"
+				},
 				"typeProperties": {
-					"dataset": {
-						"referenceName": "nyc_taxi_data_csv",
-						"type": "DatasetReference"
-					},
-					"fieldList": [
-						"childItems"
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "use nyc_taxi_ldw;\nselect distinct year,month from bronze.vw_trip_data_green;"
+						}
 					],
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"enablePartitionDiscovery": false
-					},
-					"formatSettings": {
-						"type": "DelimitedTextReadSettings"
-					}
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "ForEachPartition",
+				"description": "For each year and month partition data",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Metadata1",
+						"activity": "getFolderList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -45,13 +43,14 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get Metadata1').output",
+						"value": "@activity('getFolderList').output.resultSets[0].rows",
 						"type": "Expression"
 					},
+					"batchCount": 5,
 					"activities": [
 						{
-							"name": "Get Metadata2",
-							"type": "GetMetadata",
+							"name": "Delete Partitions",
+							"type": "Delete",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
@@ -63,30 +62,116 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
-									"referenceName": "nyc_taxi_data_dynamic",
-									"type": "DatasetReference"
+									"referenceName": "ds_nyc_taxi_data",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": {
+											"value": "@concat('raw/silver/trip_data_green/year=',item().year,'/month=',item().month)",
+											"type": "Expression"
+										}
+									}
 								},
-								"fieldList": [],
+								"enableLogging": false,
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
 									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
 								}
+							}
+						},
+						{
+							"name": "create silver partition",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Delete Partitions",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[silver].[usp_silver_trip_data_green]",
+								"storedProcedureParameters": {
+									"month": {
+										"value": {
+											"value": "@item().month",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"year": {
+										"value": {
+											"value": "@item().year",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_nyc_taxi_ldw",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
 				}
+			},
+			{
+				"name": "create silver trip data view",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "ForEachPartition",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_nyc_taxi_ldw",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "use nyc_taxi_ldw;"
+						},
+						{
+							"type": "NonQuery",
+							"text": "DROP VIEW IF EXISTS silver.vw_trip_data_green;"
+						},
+						{
+							"type": "NonQuery",
+							"text": "CREATE VIEW silver.vw_trip_data_green\nAS\nSELECT cast (result.filepath(1) as varchar(4)) AS 'year',\ncast (result.filepath(2) as varchar(2)) AS 'month',\nresult.* \nFROM\n    OPENROWSET\n        (\n            BULK 'silver/trip_data_green/year=*/month=*/*.parquet',\n            FORMAT='parquet',\n            DATA_SOURCE='nyc_taxi_src'\n        )AS result"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
-		"parameters": {
-			"path": {
-				"type": "string"
-			}
-		},
 		"variables": {
 			"folderList": {
+				"type": "Array"
+			},
+			"folders": {
 				"type": "Array"
 			}
 		},
