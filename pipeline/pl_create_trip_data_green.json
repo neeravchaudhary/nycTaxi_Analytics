@@ -29,7 +29,8 @@
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "ForEachPartition",
+				"description": "For each year and month partition data",
 				"type": "ForEach",
 				"dependsOn": [
 					{
@@ -42,12 +43,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('getFolderList').output",
+						"value": "@activity('getFolderList').output.resultSets[0].rows",
 						"type": "Expression"
 					},
 					"activities": [
 						{
-							"name": "Delete1",
+							"name": "Delete Partitions",
 							"type": "Delete",
 							"dependsOn": [],
 							"policy": {
@@ -64,7 +65,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
-											"value": "@concat('raw/silver/trip_data_green',item().year)",
+											"value": "@concat('raw/silver/trip_data_green/year=',item().year,'/month=',item().month)",
 											"type": "Expression"
 										}
 									}
@@ -75,6 +76,49 @@
 									"recursive": true,
 									"enablePartitionDiscovery": false
 								}
+							}
+						},
+						{
+							"name": "create silver partitions",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Delete Partitions",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[silver].[usp_silver_trip_data_green]",
+								"storedProcedureParameters": {
+									"month": {
+										"value": {
+											"value": "@item().month",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"year": {
+										"value": {
+											"value": "@item().year",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_nyc_taxi_ldw",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
