@@ -2,7 +2,7 @@
 	"name": "create_vw_silver_trip_data_green",
 	"properties": {
 		"folder": {
-			"name": "nyc_taxi/ldw/script_silver"
+			"name": "nyc_taxi/nyc_taxi_ldw/script_silver"
 		},
 		"content": {
 			"query": "use nyc_taxi_ldw\nGO\n\nDROP VIEW IF EXISTS silver.vw_trip_data_green\nGO\n\nCREATE VIEW silver.vw_trip_data_green\nAS\nSELECT cast (result.filepath(1) as varchar(4)) AS 'year',\ncast (result.filepath(2) as varchar(2)) AS 'month',\nresult.* \nFROM\n    OPENROWSET\n        (\n            BULK 'silver/trip_data_green/year=*/month=*/*.parquet',\n            FORMAT='parquet',\n            DATA_SOURCE='nyc_taxi_src'\n        )AS result",

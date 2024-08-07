@@ -2,7 +2,7 @@
 	"name": "usp_silver_payment_type",
 	"properties": {
 		"folder": {
-			"name": "nyc_taxi/ldw/usp"
+			"name": "nyc_taxi/nyc_taxi_ldw/usp"
 		},
 		"content": {
 			"query": "use nyc_taxi_ldw\nGO;\n\n\nCREATE OR ALTER PROCEDURE silver.usp_silver_payment_type\nAS\nBEGIN\n\n    IF OBJECT_ID('silver.payment_type') IS NOT NULL\n    Drop EXTERNAL TABLE silver.payment_type;\n\n    create EXTERNAL TABLE silver.payment_type\n    WITH(\n        LOCATION='silver/payment_type',\n        DATA_SOURCE=nyc_taxi_src,\n        FILE_FORMAT=parquet_file_format\n    )\n    AS\n    SELECT payment_type,payment_type_desc \n    FROM \n    OPENROWSET(\n        BULK 'payment_type.json',\n        DATA_SOURCE='nyc_taxi_src',\n        FORMAT='CSV',\n        FIELDTERMINATOR='0x0b',\n        FIELDQUOTE='0x0b'\n    )\n    WITH\n    (\n        jsondata NVARCHAR(MAX)\n    ) as payment_type_json\n    CROSS APPLY OPENJSON(jsondata)\n    WITH\n        (\n            payment_type smallint,\n            payment_type_desc varchar(25)\n        ) as payment_type_data\nEND;",
