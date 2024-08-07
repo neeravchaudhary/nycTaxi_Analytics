@@ -1,5 +1,5 @@
 {
-	"name": "pl_create_silver_trip_data_green",
+	"name": "pl_create_gold_trip_data_green",
 	"properties": {
 		"activities": [
 			{
@@ -22,7 +22,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "use nyc_taxi_ldw;\nselect distinct year,month from bronze.vw_trip_data_green;"
+							"text": "use nyc_taxi_ldw;\nselect distinct year,month from silver.vw_trip_data_green;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
@@ -66,7 +66,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
-											"value": "@concat('raw/silver/trip_data_green/year=',item().year,'/month=',item().month)",
+											"value": "@concat('raw/gold/trip_data_green/year=',item().year,'/month=',item().month)",
 											"type": "Expression"
 										}
 									}
@@ -99,7 +99,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[silver].[usp_silver_trip_data_green]",
+								"storedProcedureName": "[gold].[usp_gold_trip_data_green]",
 								"storedProcedureParameters": {
 									"month": {
 										"value": {
@@ -156,11 +156,11 @@
 						},
 						{
 							"type": "NonQuery",
-							"text": "DROP VIEW IF EXISTS silver.vw_trip_data_green;"
+							"text": "DROP VIEW IF EXISTS gold.vw_gold_trip_data_green;"
 						},
 						{
 							"type": "NonQuery",
-							"text": "CREATE VIEW silver.vw_trip_data_green\nAS\nSELECT cast (result.filepath(1) as varchar(4)) AS 'year',\ncast (result.filepath(2) as varchar(2)) AS 'month',\nresult.* \nFROM\n    OPENROWSET\n        (\n            BULK 'silver/trip_data_green/year=*/month=*/*.parquet',\n            FORMAT='parquet',\n            DATA_SOURCE='nyc_taxi_src'\n        )AS result"
+							"text": "CREATE VIEW gold.vw_gold_trip_data_green \nAS\nSELECT * FROM\n    OPENROWSET  \n        (\n            BULK 'gold/trip_data_green/year=*/month=*/*.parquet',\n            DATA_SOURCE='nyc_taxi_src',\n            FORMAT='parquet'\n        ) AS result;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
