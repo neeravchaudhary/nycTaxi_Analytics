@@ -41,6 +41,10 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
+					"items": {
+						"value": "@activity('getFolderList').output",
+						"type": "Expression"
+					},
 					"activities": [
 						{
 							"name": "Delete1",
@@ -60,7 +64,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": {
-											"value": "@concat('raw/silver/trip_data_green',item())",
+											"value": "@concat('raw/silver/trip_data_green',item().year)",
 											"type": "Expression"
 										}
 									}
