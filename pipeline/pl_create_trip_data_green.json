@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Metadata1",
-				"type": "GetMetadata",
+				"name": "getFolderList",
+				"type": "Script",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -14,101 +14,18 @@
 					"secureInput": false
 				},
 				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "nyc_taxi_data_csv",
-						"type": "DatasetReference"
-					},
-					"fieldList": [
-						"childItems"
-					],
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					},
-					"formatSettings": {
-						"type": "DelimitedTextReadSettings"
-					}
-				}
-			},
-			{
-				"name": "ForEach1",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Set variable1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('Get Metadata1').output",
-						"type": "Expression"
-					},
-					"activities": [
-						{
-							"name": "Get Metadata2",
-							"type": "GetMetadata",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"dataset": {
-									"referenceName": "nyc_taxi_data_dynamic",
-									"type": "DatasetReference",
-									"parameters": {
-										"path": {
-											"value": "@map(filter(activity('GetMetadataActivity').output.childItems, item().type == 'Folder'), concat('raw/trip_data_green_csv/', item().name))",
-											"type": "Expression"
-										}
-									}
-								},
-								"fieldList": [],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							}
-						}
-					]
-				}
-			},
-			{
-				"name": "Set variable1",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get Metadata1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
+				"linkedServiceName": {
+					"referenceName": "ls_nyc_taxi_ldw",
+					"type": "LinkedServiceReference"
 				},
-				"userProperties": [],
 				"typeProperties": {
-					"variableName": "folders",
-					"value": {
-						"value": "@activity('Get Metadata1').output",
-						"type": "Expression"
-					}
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "use nyc_taxi_ldw;\nselect distinct year,month from bronze.vw_trip_data_green;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
