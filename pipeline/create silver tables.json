@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "create each silver tables",
+				"name": "create silver ldw",
 				"type": "ForEach",
 				"dependsOn": [],
 				"userProperties": [],
@@ -45,7 +45,7 @@
 							}
 						},
 						{
-							"name": "Stored procedure1",
+							"name": "create silver Taxi tables",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
