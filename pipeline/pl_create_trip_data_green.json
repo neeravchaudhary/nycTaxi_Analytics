@@ -24,6 +24,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
@@ -36,7 +37,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Metadata1",
+						"activity": "Set variable1",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -64,11 +65,18 @@
 							"typeProperties": {
 								"dataset": {
 									"referenceName": "nyc_taxi_data_dynamic",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"path": {
+											"value": "@map(filter(activity('GetMetadataActivity').output.childItems, item().type == 'Folder'), concat('raw/trip_data_green_csv/', item().name))",
+											"type": "Expression"
+										}
+									}
 								},
 								"fieldList": [],
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
 									"enablePartitionDiscovery": false
 								},
 								"formatSettings": {
@@ -78,15 +86,37 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "folders",
+					"value": {
+						"value": "@activity('Get Metadata1').output",
+						"type": "Expression"
+					}
+				}
 			}
 		],
-		"parameters": {
-			"path": {
-				"type": "string"
-			}
-		},
 		"variables": {
 			"folderList": {
+				"type": "Array"
+			},
+			"folders": {
 				"type": "Array"
 			}
 		},
