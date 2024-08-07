@@ -3,55 +3,62 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Delete before next load",
-				"type": "Delete",
+				"name": "create each silver tables",
+				"type": "ForEach",
 				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataset": {
-						"referenceName": "ds_nyc_taxi_data",
-						"type": "DatasetReference"
+					"items": {
+						"value": "[\n   {\n      \"folderPath\":\"raw/silver/calendar\",\n      \"procedureName\":\"silver.usp_silver_calendar\"\n   },\n   {\n      \"folderPath\":\"raw/silver/payment_type\",\n      \"procedureName\":\"silver.usp_silver_payment_type\"\n   },\n   {\n      \"folderPath\":\"raw/silver/rate_code\",\n      \"procedureName\":\"silver.usp_silver_rate_code\"\n   },\n   {\n      \"folderPath\":\"raw/silver/taxi_zone\",\n      \"procedureName\":\"silver.usp_silver_taxi_zone\"\n   },\n   {\n      \"folderPath\":\"raw/silver/trip_type\",\n      \"procedureName\":\"silver.usp_silver_trip_type\"\n   },\n   {\n      \"folderPath\":\"raw/silver/vendor\",\n      \"procedureName\":\"silver.usp_silver_vendor\"\n   }\n]",
+						"type": "Expression"
 					},
-					"enableLogging": false,
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					}
-				}
-			},
-			{
-				"name": "create_silver_taxi_zone",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Delete before next load",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[silver].[usp_silver_taxi_zone]"
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_nyc_taxi_ldw",
-					"type": "LinkedServiceReference"
+					"activities": [
+						{
+							"name": "Delete before next load",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_nyc_taxi_data",
+									"type": "DatasetReference"
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						},
+						{
+							"name": "create_silver_taxi_zone",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[silver].[usp_silver_taxi_zone]"
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_nyc_taxi_ldw",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
 				}
 			}
 		],
