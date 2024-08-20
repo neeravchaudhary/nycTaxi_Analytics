@@ -1,5 +1,5 @@
 {
-	"name": "serverless Sql practice",
+	"name": "Dedicated Sql  pool practice",
 	"properties": {
 		"folder": {
 			"name": "nyc_taxi/nyc_taxi_ldw"
@@ -10,8 +10,8 @@
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "mydb",
-				"poolName": "Built-in"
+				"databaseName": "testpool",
+				"poolName": "testpool"
 			},
 			"resultLimit": 5000
 		},
