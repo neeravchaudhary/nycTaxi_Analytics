@@ -1,5 +1,5 @@
 {
-	"name": "Dedicated Sql  pool practice",
+	"name": "Dedicated Sql  pool practice_csv",
 	"properties": {
 		"folder": {
 			"name": "nyc_taxi/nyc_taxi_ldw"
