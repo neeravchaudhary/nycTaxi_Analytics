@@ -1,0 +1,20 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/nyc_taxi_ldw"
+		},
+		"content": {
+			"query": "create DATABASE SCOPED CREDENTIAL cred_ds\nWITH IDENTITY = 'Managed Identity'\n\nCREATE EXTERNAL FILE FORMAT tsv_format\nWITH(\n    FORMAT_TYPE=DELIMITEDTEXT,\n    FORMAT_OPTIONS\n    (\n        FIELD_TERMINATOR='\\t',\n        ENCODING = 'UTF8',\n        PARSER_VERSION='1.0'\n    ),\n    DATA_COMPRESSION='org.apache.hadoop.io.compress.GzipCodec'\n)\n\ndrop EXTERNAL DATA SOURCE ext_ds\n\ncreate EXTERNAL DATA SOURCE ext_ds\nWITH(\n    LOCATION='wasbs://population@covid24reportsa.blob.core.windows.net/',\n    CREDENTIAL=cred_ds\n)\n\nSELECT * FROM OPENROWSET(\n    BULK 'population_by_age.tsv',\n    DATA_SOURCE='ext_ds',\n    FORMAT='CSV',\n    FIELDTERMINATOR='\\t',\n    --DATA_COMPRESSION='GZIP',\n    PARSER_VERSION='2.0',\n    FIRSTROW=2\n)\nWITH(\n    field1 VARCHAR(50),\n    field2 VARCHAR(50),\n    field3 VARCHAR(50),\n    field4 VARCHAR(50),\n    field5 VARCHAR(50),\n    field6 VARCHAR(50),\n    field7 VARCHAR(50),\n    field8 VARCHAR(50),\n    field9 VARCHAR(50),\n    field10 VARCHAR(50),\n    field11 VARCHAR(50),\n    field12 VARCHAR(50),\n    field13 VARCHAR(50),\n    field14 VARCHAR(50)\n    )as result",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "mydb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
