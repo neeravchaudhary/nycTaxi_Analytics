@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 2",
+	"properties": {
+		"content": {
+			"query": "INSERT INTO Sales.Orders  VALUES (1, 'SalesRep1', 'Valve', 5);\nINSERT INTO Sales.Orders  VALUES (2, 'SalesRep1', 'Wheel', 2);\nINSERT INTO Sales.Orders  VALUES (3, 'SalesRep1', 'Valve', 4);\nINSERT INTO Sales.Orders  VALUES (4, 'SalesRep2', 'Bracket', 2);\nINSERT INTO Sales.Orders  VALUES (5, 'SalesRep2', 'Wheel', 5);\nINSERT INTO Sales.Orders  VALUES (6, 'SalesRep2', 'Seat', 5);\n-- View the 6 rows in the table\nSELECT * FROM Sales.Orders;\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "testpool",
+				"poolName": "testpool"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
