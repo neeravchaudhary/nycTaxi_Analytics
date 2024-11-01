@@ -1,0 +1,22 @@
+{
+	"name": "test_db",
+	"properties": {
+		"Name": "test_db",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://demo@dlprformula1.dfs.core.windows.net/test_db",
+			"Properties": {
+				"FormatType": "csv",
+				"LinkedServiceName": "synapse-demo2024-WorkspaceDefaultStorage"
+			}
+		}
+	},
+	"type": "DATABASE"
+}
